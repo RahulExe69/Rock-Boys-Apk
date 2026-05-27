@@ -1,5 +1,5 @@
 {
-  "name": "RockBoys",
+  "name": "Rock Boys",
   "description": "Official premium native experience for the RockBoys gaming community.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

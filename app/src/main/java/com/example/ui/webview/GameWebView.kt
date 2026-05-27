@@ -116,8 +116,15 @@ fun GameWebView(
                         settings.setSupportZoom(false)
                         settings.setBuiltInZoomControls(false)
                         settings.setDisplayZoomControls(false)
+                        settings.textZoom = 100
+                        settings.mediaPlaybackRequiresUserGesture = false
                         settings.cacheMode = WebSettings.LOAD_DEFAULT
                         settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+                        
+                        // Enable cookie acceptance for smoother state synchronization
+                        val cookieManager = CookieManager.getInstance()
+                        cookieManager.setAcceptCookie(true)
+                        cookieManager.setAcceptThirdPartyCookies(this, true)
                         
                         // Download integration support
                         setDownloadListener { url, userAgent, contentDisposition, mimetype, _ ->
@@ -151,6 +158,27 @@ fun GameWebView(
                                 isPageLoading = false
                                 canGoBackState = view?.canGoBack() ?: false
                                 canGoForwardState = view?.canGoForward() ?: false
+                                
+                                // Inject mobile viewport configurations to completely block pinch and double-tap zoom
+                                view?.evaluateJavascript(
+                                    "var valSet = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'; " +
+                                    "var metas = document.getElementsByTagName('meta'); " +
+                                    "var found = false; " +
+                                    "for (var i = 0; i < metas.length; i++) { " +
+                                    "  if (metas[i].getAttribute('name') === 'viewport') { " +
+                                    "    metas[i].setAttribute('content', valSet); " +
+                                    "    found = true; " +
+                                    "    break; " +
+                                    "  } " +
+                                    "} " +
+                                    "if (!found) { " +
+                                        "  var meta = document.createElement('meta'); " +
+                                        "  meta.name = 'viewport'; " +
+                                        "  meta.content = valSet; " +
+                                        "  document.getElementsByTagName('head')[0].appendChild(meta); " +
+                                        "}",
+                                    null
+                                )
                                 onPageLoaded()
                             }
 
