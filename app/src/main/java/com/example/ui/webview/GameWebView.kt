@@ -13,6 +13,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -26,12 +27,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.example.R
 import com.example.ui.theme.CyberBlack
 import com.example.ui.theme.CyberDark
 import com.example.ui.theme.CyberGray
@@ -267,68 +271,70 @@ fun GameWebView(
             // Beautiful Gaming Offline Retry Screen Overlay
             AnimatedVisibility(
                 visible = hasError,
-                enter = fadeIn() + expandVertically(),
-                exit = fadeOut() + shrinkVertically()
+                enter = fadeIn(),
+                exit = fadeOut()
             ) {
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(CyberBlack),
+                    modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center,
+                    // Full-screen background image matching the reference
+                    Image(
+                        painter = painterResource(id = R.drawable.no_network_background),
+                        contentDescription = "No Network Background",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                    
+                    // Dim layer for content readability
+                    Box(
                         modifier = Modifier
-                            .padding(32.dp)
-                            .background(CyberDark, shape = RoundedCornerShape(16.dp))
-                            .border(width = 1.dp, color = LaserRed.copy(alpha = 0.5f), shape = RoundedCornerShape(16.dp))
-                            .padding(24.dp)
+                            .fillMaxSize()
+                            .background(Color.Black.copy(alpha = 0.6f))
+                    )
+                    
+                    // Authentic styled Clash of Clans connection error card
+                    Column(
+                        modifier = Modifier
+                            .padding(horizontal = 32.dp)
+                            .fillMaxWidth()
+                            .background(Color(0xFF2C1C1A), shape = RoundedCornerShape(8.dp))
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.Start,
+                        verticalArrangement = Arrangement.Center
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Warning,
-                            contentDescription = "Disconnection Warning",
-                            tint = LaserRed,
-                            modifier = Modifier.size(64.dp)
+                        Text(
+                            text = "Connection error",
+                            color = Color.White,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
                         )
                         
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(14.dp))
                         
                         Text(
-                            text = "ESTABLISHING CONNECTION FAILED",
-                            color = TextColorLaserRed,
+                            text = "Unable to connect with the server. Check your internet connection and try again.",
+                            color = Color.White.copy(alpha = 0.9f),
+                            fontSize = 15.sp,
+                            lineHeight = 22.sp,
+                            textAlign = TextAlign.Start
+                        )
+                        
+                        Spacer(modifier = Modifier.height(28.dp))
+                        
+                        Text(
+                            text = "Try again",
+                            color = Color.White,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center,
-                            letterSpacing = 1.sp
+                            modifier = Modifier
+                                .clickable {
+                                    hasError = false
+                                    isPageLoading = true
+                                    webViewInstance?.reload()
+                                }
+                                .padding(8.dp)
                         )
-                        
-                        Spacer(modifier = Modifier.height(8.dp))
-                        
-                        Text(
-                            text = "We are unable to communicate with RockBoys servers. Please verify that your system is online.",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontSize = 13.sp,
-                            textAlign = TextAlign.Center
-                        )
-                        
-                        Spacer(modifier = Modifier.height(24.dp))
-                        
-                        Button(
-                            onClick = {
-                                hasError = false
-                                isPageLoading = true
-                                webViewInstance?.reload()
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = LaserRed),
-                            shape = RoundedCornerShape(8.dp)
-                        ) {
-                            Text(
-                                text = "RETRY SENSORS",
-                                color = Color.White,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
                     }
                 }
             }

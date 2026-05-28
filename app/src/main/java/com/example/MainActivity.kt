@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
-    private lateinit var networkMonitor: NetworkMonitor
     private var isWebViewLoading = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,29 +28,6 @@ class MainActivity : ComponentActivity() {
         }
         
         enableEdgeToEdge()
-        
-        networkMonitor = NetworkMonitor(applicationContext)
-
-        // Monitor network state dynamically to spawn native toast notifications
-        lifecycleScope.launch {
-            var firstCollect = true
-            networkMonitor.isConnected.collectLatest { isConnected ->
-                if (!isConnected) {
-                    Toast.makeText(
-                        applicationContext,
-                        "Internet Connection Lost. Core sectors operating on cache.",
-                        Toast.LENGTH_LONG
-                    ).show()
-                } else if (!firstCollect) {
-                    Toast.makeText(
-                        applicationContext,
-                        "Connection Restored. Sensors Online.",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-                firstCollect = false
-            }
-        }
 
         setContent {
             MyApplicationTheme {
